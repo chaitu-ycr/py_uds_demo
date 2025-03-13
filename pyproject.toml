@@ -1,0 +1,45 @@
+[project]
+name = "python_project_template"
+version = "0.0.1"
+description = "this is python project template description"
+license = { text = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "chaitu-ycr", email = "chaitu.ycr@gmail.com" }]
+keywords = ["python", "template"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows"
+]
+dynamic = [ "dependencies" ]
+
+[project.urls]
+homepage = "https://github.com/chaitu-ycr/python_project_template"
+repository = "https://github.com/chaitu-ycr/python_project_template"
+documentation = "https://chaitu-ycr.github.io/python_project_template/"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "*"
+pytest = "*"
+pytest-html = "*"
+pytest-sugar = "*"
+pytest-clarity = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-xdist = "*"
+pytest-timeout = "*"
+pytest-randomly = "*"
+pytest-rerunfailures = "*"
+pytest-watch = "*"
+pytest-pdb = "*"
+mkdocs-material = "*"
+mkdocstrings-python = "*"
+mkdocs-include-markdown-plugin = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

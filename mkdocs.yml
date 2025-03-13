@@ -1,0 +1,31 @@
+site_name: python_project_template
+site_url: https://chaitu-ycr.github.io/python_project_template/
+site_description: this is python project template description
+site_author: chaitu-ycr
+
+repo_name: chaitu-ycr/python_project_template
+repo_url: https://github.com/chaitu-ycr/python_project_template
+edit_uri: blob/main/docs/
+
+nav:
+  - Overview: index.md
+  - Reference: reference_manual.md
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            merge_init_into_class: true
+            show_docstring_modules: false
+  - include-markdown:
+      recursive: true
+  - search
+
+theme:
+  name: readthedocs
+  features:
+    - toc.integrate
+    - search
