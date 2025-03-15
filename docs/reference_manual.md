@@ -1,3 +1,3 @@
 # package reference manual
 
-::: python_project_template
+::: py_uds_demo

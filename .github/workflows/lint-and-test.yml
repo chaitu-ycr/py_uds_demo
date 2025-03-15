@@ -25,7 +25,7 @@ jobs:
           poetry install
 
       - name: Run pylint
-        run: poetry run pylint python_project_template
+        run: poetry run pylint py_uds_demo
 
       - name: Run pytest
         run: poetry run pytest

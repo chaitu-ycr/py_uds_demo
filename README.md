@@ -1,6 +1,6 @@
-# python_project_template
+# py_uds_demo
 
-My Python 🐍 projects template. MKDocs is used for documentation.
+Learn and Practice UDS Protocol
 
 ## environment setup
 

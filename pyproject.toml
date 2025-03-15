@@ -1,7 +1,7 @@
 [project]
-name = "python_project_template"
-version = "0.0.1"
-description = "this is python project template description"
+name = "py_uds_demo"
+version = "2025.0.0"
+description = "Learn and Practice UDS Protocol"
 license = { text = "LICENSE" }
 readme = "README.md"
 requires-python = ">=3.9"
@@ -15,12 +15,13 @@ classifiers = [
 dynamic = [ "dependencies" ]
 
 [project.urls]
-homepage = "https://github.com/chaitu-ycr/python_project_template"
-repository = "https://github.com/chaitu-ycr/python_project_template"
-documentation = "https://chaitu-ycr.github.io/python_project_template/"
+homepage = "https://github.com/chaitu-ycr/py_uds_demo"
+repository = "https://github.com/chaitu-ycr/py_uds_demo"
+documentation = "https://chaitu-ycr.github.io/py_uds_demo/"
 
 [tool.poetry.dependencies]
-python = ">=3.9"
+python = ">=3.9,<3.9.7 || >3.9.7"
+streamlit = "*"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "*"

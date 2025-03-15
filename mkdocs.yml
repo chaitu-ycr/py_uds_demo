@@ -1,10 +1,10 @@
-site_name: python_project_template
-site_url: https://chaitu-ycr.github.io/python_project_template/
-site_description: this is python project template description
+site_name: py_uds_demo
+site_url: https://chaitu-ycr.github.io/py_uds_demo/
+site_description: Learn and Practice UDS Protocol
 site_author: chaitu-ycr
 
-repo_name: chaitu-ycr/python_project_template
-repo_url: https://github.com/chaitu-ycr/python_project_template
+repo_name: chaitu-ycr/py_uds_demo
+repo_url: https://github.com/chaitu-ycr/py_uds_demo
 edit_uri: blob/main/docs/
 
 nav:

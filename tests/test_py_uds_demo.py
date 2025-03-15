@@ -1,5 +1,5 @@
 import pytest
-from python_project_template import MyClass
+from py_uds_demo import MyClass
 
 def test_init(capsys):
     # Test initialization of MyClass

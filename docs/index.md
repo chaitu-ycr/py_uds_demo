@@ -1,3 +1,3 @@
-# python_project_template
+# py_uds_demo
 
 {% include "../README.md" %}
