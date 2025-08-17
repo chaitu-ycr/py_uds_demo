@@ -134,3 +134,4 @@ _temp
 poetry.lock
 .vscode
 /tests/report/
+uv.lock

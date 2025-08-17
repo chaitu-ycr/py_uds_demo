@@ -1,36 +1,49 @@
 @echo off
 
-title "creating/updating tool environment..."
+REM ============================
+REM Create or Update Python Virtual Environment and Install Dependencies
+REM ============================
 
+title Creating/Updating Tool Environment...
+
+REM Move to script directory and then project root
 pushd %~dp0
 cd ..
-set python_venv_path=%CD%\.venv
-set python_exe=%python_venv_path%\Scripts\python.exe
 
-:PYTHON_VENV
-if exist %python_venv_path% (
-	echo "using '%python_exe%' python."
-	echo "upgrade python pip module, install poetry and install repo dependencies..."
-	%python_exe% -m pip install pip --upgrade
-	%python_exe% -m pip install poetry --upgrade
-	%python_exe% -m poetry lock
-	%python_exe% -m poetry install
-	echo "completed installing tool dependencies."
+REM Set venv path and python executable
+set "VENV_PATH=%CD%\.venv"
+set "PYTHON_EXE=%VENV_PATH%\Scripts\python.exe"
+
+REM ----------------------------
+REM 1. Check if venv exists, else create it
+REM ----------------------------
+:CHECK_VENV
+if exist "%VENV_PATH%" (
+    echo Using '%PYTHON_EXE%' python.
+    "%PYTHON_EXE%" --version
+    echo Upgrading pip, installing uv, and syncing dependencies...
+    "%PYTHON_EXE%" -m pip install --upgrade pip
+    "%PYTHON_EXE%" -m pip install --upgrade uv
+    "%PYTHON_EXE%" -m uv sync --link-mode=copy
+    echo Completed installing tool dependencies.
+    popd
+    goto :EOF
 ) else (
-    GOTO :VENV_ERROR
+    echo.
+    echo Virtual environment not found at '%VENV_PATH%'
+    echo Creating virtual environment now...
+    python --version
+    python -m venv "%VENV_PATH%"
+    if %ERRORLEVEL% NEQ 0 goto ERROR
+    echo Completed venv creation.
+    goto CHECK_VENV
 )
-GOTO :eof
 
-:VENV_ERROR
-echo.
-echo '%python_venv_path%' not found
-echo "Creating virtual environment now..."
-echo.
-python -m venv %python_venv_path%
-echo "completed venv creation."
-GOTO :PYTHON_VENV
-
+REM ----------------------------
+REM Error Handler
+REM ----------------------------
 :ERROR
-echo "failed to run extract due to error %ERRORLEVEL%."
+echo Failed to setup virtual environment due to error %ERRORLEVEL%.
 popd
 pause
+goto :EOF

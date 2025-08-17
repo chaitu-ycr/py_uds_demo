@@ -1,3 +1,3 @@
 # package reference manual
 
-::: py_uds_demo
+::: src.py_uds_demo

@@ -1,29 +1,49 @@
 @echo off
 
-title "deploying document to GitHub Pages using mkdocs"
+REM ============================
+REM Deploy MkDocs Documentation to GitHub Pages
+REM ============================
 
+REM Set window title
+title Deploying Documentation to GitHub Pages
+
+REM Save original directory and move to project root
+set "ORIGIN_DIR=%CD%"
 pushd %~dp0
 cd ..
-set cmd_venv_activate=%CD%\.venv\Scripts\activate.bat
-set cmd_venv_deactivate=%CD%\.venv\Scripts\deactivate.bat
+set "ROOT_DIR=%CD%"
 
-:ACTIVATE_VENV
-call %cmd_venv_activate%
-if %ERRORLEVEL% NEQ 0 (GOTO ERROR)
+REM Set venv activation/deactivation commands
+set "VENV_ACTIVATE=%ROOT_DIR%\.venv\Scripts\activate.bat"
+set "VENV_DEACTIVATE=%ROOT_DIR%\.venv\Scripts\deactivate.bat"
 
-:START_MKDOCS_SERVER
-mkdocs gh-deploy
-if %ERRORLEVEL% NEQ 0 (GOTO ERROR)
+REM ----------------------------
+REM 1. Activate Virtual Environment
+REM ----------------------------
+call "%VENV_ACTIVATE%"
+if %ERRORLEVEL% NEQ 0 goto ERROR
 
-:END
-call %cmd_venv_deactivate%
+REM ----------------------------
+REM 2. Deploy Documentation
+REM ----------------------------
+uv run mkdocs gh-deploy
+if %ERRORLEVEL% NEQ 0 goto ERROR
+
+REM ----------------------------
+REM 3. Deactivate Virtual Environment and Cleanup
+REM ----------------------------
+call "%VENV_DEACTIVATE%"
 popd
-GOTO :eof
+cd "%ORIGIN_DIR%"
+goto :EOF
 
+REM ----------------------------
+REM Error Handler
+REM ----------------------------
 :ERROR
-title "Failed to run mkdocs due to error %ERRORLEVEL%"
+echo Failed to deploy documentation due to error %ERRORLEVEL%
+call "%VENV_DEACTIVATE%"
 popd
+cd "%ORIGIN_DIR%"
 pause
-GOTO :eof
-
-popd
+goto :EOF

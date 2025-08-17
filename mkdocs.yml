@@ -3,13 +3,13 @@ site_url: https://chaitu-ycr.github.io/py_uds_demo/
 site_description: Learn and Practice UDS Protocol
 site_author: chaitu-ycr
 
-repo_name: chaitu-ycr/py_uds_demo
+repo_name: ""
 repo_url: https://github.com/chaitu-ycr/py_uds_demo
 edit_uri: blob/main/docs/
 
 nav:
-  - Overview: index.md
-  - Reference: reference_manual.md
+  - py_uds_demo: index.md
+  - src_manual: src_manual.md
 
 plugins:
   - mkdocstrings:
@@ -17,7 +17,7 @@ plugins:
         python:
           options:
             docstring_style: google
-            show_source: false
+            show_source: true
             merge_init_into_class: true
             show_docstring_modules: false
   - include-markdown:
@@ -29,3 +29,9 @@ theme:
   features:
     - toc.integrate
     - search
+
+extra_css:
+  - _assets/extra.css
+
+extra_javascript:
+  - https://unpkg.com/mermaid@11.9.0/dist/mermaid.core.mjs

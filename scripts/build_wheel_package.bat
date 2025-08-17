@@ -1,27 +1,44 @@
 @echo off
 
-title "poetry build python wheel"
+REM ============================
+REM Build Python Wheel Package
+REM ============================
 
+REM Set window title
+title Building Python Wheel Package
+
+REM Move to script directory and then project root
 pushd %~dp0
 cd ..
-set cmd_venv_activate=%CD%\.venv\Scripts\activate.bat
-set cmd_venv_deactivate=%CD%\.venv\Scripts\deactivate.bat
 
-:ACTIVATE_VENV
-call %cmd_venv_activate%
-if %ERRORLEVEL% NEQ 0 (GOTO ERROR)
+REM Set venv activation/deactivation commands
+set "VENV_ACTIVATE=%CD%\.venv\Scripts\activate.bat"
+set "VENV_DEACTIVATE=%CD%\.venv\Scripts\deactivate.bat"
 
-:BUILD_PACKAGE
-poetry build
-if %ERRORLEVEL% NEQ 0 (GOTO ERROR)
+REM ----------------------------
+REM 1. Activate Virtual Environment
+REM ----------------------------
+call "%VENV_ACTIVATE%"
+if %ERRORLEVEL% NEQ 0 goto ERROR
 
-:END
-call %cmd_venv_deactivate%
+REM ----------------------------
+REM 2. Build the Wheel Package
+REM ----------------------------
+uv build
+if %ERRORLEVEL% NEQ 0 goto ERROR
+
+REM ----------------------------
+REM 3. Deactivate Virtual Environment and Cleanup
+REM ----------------------------
+call "%VENV_DEACTIVATE%"
 popd
-GOTO :eof
+goto :EOF
 
+REM ----------------------------
+REM Error Handler
+REM ----------------------------
 :ERROR
-title "Failed to run pytests due to error %ERRORLEVEL%"
+title Failed to build wheel package due to error %ERRORLEVEL%
 popd
 pause
-GOTO :eof
+goto :EOF
