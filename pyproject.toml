@@ -4,7 +4,7 @@ version = "25.0.1"
 description = "Learn and Practice UDS Protocol"
 license = { file = "LICENSE" }
 readme = "README.md"
-requires-python = ">=3.9, <=3.14"
+requires-python = ">=3.10, <=3.14"
 authors = [{ name = "chaitu-ycr", email = "chaitu.ycr@gmail.com" }]
 keywords = ["python", "template"]
 classifiers = [
@@ -13,7 +13,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows"
 ]
 dependencies = [
-    "streamlit",
     "gradio",
 ]
 
