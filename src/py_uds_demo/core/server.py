@@ -1,6 +1,3 @@
-import threading
-import datetime
-from time import sleep
 
 from py_uds_demo.core.utils.services import diagnostic_and_commmunication_management
 from py_uds_demo.core.utils.services import data_transmission
@@ -53,9 +50,6 @@ class UdsServer:
         self.transfer_data = upload_download.TransferData(self)
         self.request_transfer_exit = upload_download.RequestTransferExit(self)
         self.request_file_transfer = upload_download.RequestFileTransfer(self)
-        # status
-        self.active_session = self.SFID.DEFAULT_SESSION
-        self.tester_present_active = False
 
     @property
     def supported_services(self) -> list:
@@ -126,14 +120,3 @@ class UdsServer:
             # Negative Response
             case _:
                 return self.negative_response.report_negative_response(sid, self.NRC.SERVICE_NOT_SUPPORTED)
-
-    def start_active_session_timeout_thread(self):
-        previous_time = int(datetime.datetime.now().timestamp())
-        five_seconds = 5
-        while True and not self.tester_present_active:
-            current_time = int(datetime.datetime.now().timestamp())
-            if current_time - previous_time > five_seconds:
-                self.active_session = self.SFID.DEFAULT_SESSION
-                break
-            else:
-                sleep(0.1)

@@ -1,28 +1,63 @@
+# import pytest for testing
 import pytest
-from py_uds_demo import MyClass
+from py_uds_demo.core.client import UdsClient
+from py_uds_demo.core.server import UdsServer
+from py_uds_demo.core.utils.uds_constants import Sid, Nrc
 
-def test_init(capsys):
-    # Test initialization of MyClass
-    my_instance = MyClass()
-    captured = capsys.readouterr()
-    assert "message from my class init." in captured.out
+@pytest.fixture
+def uds_client():
+	return UdsClient()
 
-def test_say_hello(capsys):
-    # Test the say_hello method
-    my_instance = MyClass()
-    result = my_instance.say_hello()
-    captured = capsys.readouterr()
-    assert "hello!" in captured.out
-    assert result is True
+@pytest.fixture
+def uds_server():
+	return UdsServer()
 
-def test_say_goodbye(capsys):
-    # Test the say_goodbye method
-    my_instance = MyClass()
-    result = my_instance.say_goodbye()
-    captured = capsys.readouterr()
-    assert "goodbye!" in captured.out
-    assert result is False
+def test_send_request_positive_response(uds_client):
+	# Use a supported SID (e.g., ReadDataByIdentifier = 0x22)
+	sid = Sid().READ_DATA_BY_IDENTIFIER
+	req = [sid]
+	resp = uds_client.send_request(req, False)
+	# Should be a positive response: [sid+0x40, 0x00]
+	assert resp[0] == sid + 0x40
+	assert resp[1] == 0x00
 
-# This main guard allows the script to be run directly
-if __name__ == "__main__":
-    pytest.main()
+def test_send_request_formatted_response(uds_client):
+	sid = Sid().READ_DATA_BY_IDENTIFIER
+	req = [sid]
+	resp = uds_client.send_request(req, True)
+	# Should be a formatted string starting with green dot
+	assert resp.startswith("🟢 ")
+	assert "%02X" % (sid + 0x40) in resp
+
+def test_send_request_negative_response(uds_client):
+	# Use an unsupported SID (e.g., 0x99)
+	req = [0x99]
+	resp = uds_client.send_request(req, False)
+	# Should be a negative response: [0x7F, 0x99, NRC]
+	assert resp[0] == 0x7F
+	assert resp[1] == 0x99
+	assert resp[2] == Nrc().SERVICE_NOT_SUPPORTED
+
+def test_send_request_negative_response_formatted(uds_client):
+	req = [0x99]
+	resp = uds_client.send_request(req, True)
+	# Should be a formatted string starting with red dot
+	assert resp.startswith("🔴 ")
+	assert "7F 99" in resp
+
+def test_server_supported_services(uds_server):
+	# Should contain all SIDs
+	sids = uds_server.supported_services
+	assert Sid().DIAGNOSTIC_SESSION_CONTROL in sids
+	assert Sid().READ_DATA_BY_IDENTIFIER in sids
+
+def test_server_process_request_positive(uds_server):
+	sid = Sid().READ_DATA_BY_IDENTIFIER
+	resp = uds_server.process_request([sid])
+	assert resp[0] == sid + 0x40
+
+def test_server_process_request_negative(uds_server):
+	resp = uds_server.process_request([0x99])
+	assert resp[0] == 0x7F
+	assert resp[1] == 0x99
+	assert resp[2] == Nrc().SERVICE_NOT_SUPPORTED
