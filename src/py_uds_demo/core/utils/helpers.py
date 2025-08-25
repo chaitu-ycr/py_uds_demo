@@ -1,5 +1,13 @@
-class Sid():
-    """This class holds all service identifiers name and its value respectively.
+def split_integer_to_bytes(value: int) -> list[int]:
+    """
+    Splits an integer into a list of bytes.
+    """
+    return [(value >> (i * 8)) & 0xFF for i in range((value.bit_length() + 7) // 8)]
+
+
+class Sid:
+    """
+    This class holds all service identifiers name and its value respectively.
     Check ISO 14229 doc for more information.
     """
     def __init__(self) -> None:
@@ -39,8 +47,9 @@ class Sid():
         self.NEGATIVE_RESPONSE = self.NR = 0x7F
 
 
-class Sfid():
-    """This class holds all service identifier sub-functions name and its value respectively.
+class Sfid:
+    """
+    This class holds all service identifier sub-functions name and its value respectively.
     Check ISO 14229 doc for more information.
     """
     def __init__(self) -> None:
@@ -67,6 +76,7 @@ class Sfid():
         self.ENABLE_RX_AND_TX_WITH_ENHANCED_ADDRESS_INFORMATION = self.ERXTXWEAI = 0x05
         # tester_present
         self.ZERO_SUB_FUNCTION = self.ZSUBF = 0x00
+        self.ZERO_SUB_FUNCTION_SUPRESS_RESPONSE = 0x80
         # access_timing_parameter
         self.READ_EXTENDED_TIMING_PARAMETER_SET = self.RETPS = 0x01
         self.SET_TIMING_PARAMETERS_TO_DEFAULT_VALUE = self.STPTDV = 0x02
@@ -127,8 +137,9 @@ class Sfid():
         self.REQUEST_ROUTINE_RESULT = self.RRR = 0x03
 
 
-class Nrc():
-    """This class holds all negative response codes name and its values respectively.
+class Nrc:
+    """
+    This class holds all negative response codes name and its values respectively.
     Check ISO 14229 doc for more information.
     """
     def __init__(self) -> None:
@@ -172,3 +183,84 @@ class Nrc():
         self.TORQUE_CONVERTER_CLUTCH_LOCKED = self.TCCL = 0x91
         self.VOLTAGE_TOO_HIGH = self.VTH = 0x92
         self.VOLTAGE_TOO_LOW = self.VTL = 0x93
+
+
+class Did:
+    """
+    This class holds all diagnostic identifiers name and its values respectively.
+    """
+    def __init__(self) -> None:
+        self.VEHICLE_IDENTIFICATION_NUMBER = 0xF190
+        self.MANUFACTURER_SPARE_PART_NUMBER = 0xF187
+        self.MANUFACTURER_ECU_SOFTWARE_NUMBER = 0xF188
+        self.MANUFACTURER_ECU_SOFTWARE_VERSION = 0xF189
+        self.ECU_MANUFACTURING_DATE = 0xF18B
+        self.ECU_SERIAL_NUMBER = 0xF18C
+        self.SUPPORTED_FUNCTIONAL_UNITS = 0xF18D
+        self.SYSTEM_SUPPLIER_ECU_SOFTWARE_NUMBER = 0xF194
+        self.SYSTEM_SUPPLIER_ECU_SOFTWARE_VERSION = 0xF195
+        self.PROGRAMMING_DATE = 0xF199
+        self.REPAIR_SHOP_CODE = 0xF198
+        self.EXHAUST_REGULATION_TYPE_APPROVAL_NUMBER = 0xF196
+        self.INSTALLATION_DATE = 0xF19D
+        self.ACTIVE_DIAGNOSTIC_SESSION = 0xFF01
+
+
+class Memory:
+    """
+    This class holds all memory addresses and their corresponding values.
+    """
+    def __init__(self) -> None:
+        pass
+
+    @property
+    def vehicle_identification_number(self):
+        return split_integer_to_bytes(0x1234567890)
+
+    @property
+    def manufacturer_spare_part_number(self):
+        return split_integer_to_bytes(0x1111111111)
+
+    @property
+    def manufacturer_ecu_software_number(self):
+        return split_integer_to_bytes(0x20250801)
+
+    @property
+    def manufacturer_ecu_software_version(self):
+        return split_integer_to_bytes(0x202508010203)
+
+    @property
+    def ecu_manufacturing_date(self):
+        return split_integer_to_bytes(0x20250801)
+
+    @property
+    def ecu_serial_number(self):
+        return split_integer_to_bytes(0x1234567890)
+
+    @property
+    def supported_functional_units(self):
+        return split_integer_to_bytes(0x00000001)
+
+    @property
+    def system_supplier_ecu_software_number(self):
+        return split_integer_to_bytes(0x20250801)
+
+    @property
+    def system_supplier_ecu_software_version(self):
+        return split_integer_to_bytes(0x202508010203)
+
+    @property
+    def programming_date(self):
+        return split_integer_to_bytes(0x20250801)
+
+    @property
+    def repair_shop_code(self):
+        return split_integer_to_bytes(0x123456)
+
+    @property
+    def exhaust_regulation_type_approval_number(self):
+        return split_integer_to_bytes(0x123456)
+
+    @property
+    def ecu_installation_date(self):
+        return split_integer_to_bytes(0x20250801)

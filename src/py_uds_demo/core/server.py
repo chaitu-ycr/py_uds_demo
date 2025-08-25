@@ -1,3 +1,6 @@
+import os
+import sys
+import logging
 
 from py_uds_demo.core.utils.services import diagnostic_and_commmunication_management
 from py_uds_demo.core.utils.services import data_transmission
@@ -6,15 +9,26 @@ from py_uds_demo.core.utils.services import input_output_contol
 from py_uds_demo.core.utils.services import remote_activation_of_routine
 from py_uds_demo.core.utils.services import upload_download
 from py_uds_demo.core.utils.responses import PositiveResponse, NegativeResponse
-from py_uds_demo.core.utils.uds_constants import Sid, Sfid, Nrc
+from py_uds_demo.core.utils.helpers import Sid, Sfid, Nrc, Did, Memory
 
 
 class UdsServer:
+    """
+    UdsServer implements the Unified Diagnostic Services (UDS) server functionality.
+
+    This class initializes all supported UDS services, constants, and response handlers. It provides
+    a method to process incoming diagnostic requests and route them to the appropriate service handler.
+    """
     def __init__(self):
+        # Logger
+        self.DEFAULT_LOG_FILE = "_temp/logs/uds_simulator.log"
+        self.logger = self._initialize_logger()
         # Constants
         self.SID = Sid()
         self.SFID = Sfid()
         self.NRC = Nrc()
+        self.did = Did()
+        self.memory = Memory()
         # Responses
         self.positive_response = PositiveResponse()
         self.negative_response = NegativeResponse()
@@ -51,12 +65,49 @@ class UdsServer:
         self.request_transfer_exit = upload_download.RequestTransferExit(self)
         self.request_file_transfer = upload_download.RequestFileTransfer(self)
 
+    def _initialize_logger(self):
+        """
+        Initialize the logger.
+
+        Sets up the logging configuration to log messages to both console and a file.
+        """
+        os.makedirs(os.path.dirname(self.DEFAULT_LOG_FILE), exist_ok=True)
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        fmt = "%(asctime)s [UDS_SIM_UI] [%(levelname)-4.8s] %(message)s"
+        if not any(isinstance(h, logging.FileHandler) for h in logger.handlers):
+            file_handler = logging.FileHandler(self.DEFAULT_LOG_FILE, encoding='utf-8')
+            file_handler.setLevel(logging.INFO)
+            file_handler.setFormatter(logging.Formatter(fmt))
+            logger.addHandler(file_handler)
+        if not any(isinstance(h, logging.StreamHandler) for h in logger.handlers):
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setLevel(logging.INFO)
+            console_handler.setFormatter(logging.Formatter(fmt))
+            logger.addHandler(console_handler)
+        logger.propagate = True
+        return logger
+
     @property
     def supported_services(self) -> list:
+        """
+        List all supported UDS service identifiers (SIDs).
+
+        Returns:
+            list: A list of supported service identifiers.
+        """
         return list(self.SID.__dict__.values())
 
     def process_request(self, data_stream: list) -> list:
-        """Process the incoming data stream and return a response."""
+        """
+        Process the incoming data stream and return a UDS response.
+
+        Args:
+            data_stream (list): The incoming diagnostic request as a list of bytes/integers.
+
+        Returns:
+            list: The response to the request, as a list of bytes/integers.
+        """
         sid = data_stream[0]
         match sid:
             # Diagnostic and communication management
