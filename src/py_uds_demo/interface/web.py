@@ -4,7 +4,7 @@ import gradio as gr
 from py_uds_demo.core.client import UdsClient
 
 
-class WebUi:
+class Web:
     """
     WebUi provides a Gradio-based web interface for interacting with the UDS (Unified Diagnostic Services) simulator.
 
@@ -57,7 +57,7 @@ class WebUi:
         diagnostic_request_clean = diagnostic_request.replace(" ", "")
         try:
             diagnostic_request_stream = [int(diagnostic_request_clean[i:i+2], 16) for i in range(0, len(diagnostic_request_clean), 2)]
-            user_sent_request = self.uds_client._format_request(diagnostic_request_stream)
+            user_sent_request = self.uds_client.format_request(diagnostic_request_stream)
             chat_history.append({"role": "user", "content": user_sent_request})
             diagnostic_response = self.uds_client.send_request(diagnostic_request_stream, True)
             chat_history.append({"role": "assistant", "content": diagnostic_response})
@@ -84,5 +84,5 @@ class WebUi:
 
 
 if __name__ == "__main__":
-    web_ui = WebUi()
+    web_ui = Web()
     web_ui.run()

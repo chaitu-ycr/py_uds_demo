@@ -11,7 +11,7 @@ class UdsClient:
         """Initializes the UdsClient and creates an instance of UdsServer."""
         self.server = UdsServer()
 
-    def _format_request(self, request: list) -> str:
+    def format_request(self, request: list) -> str:
         """Formats the UDS request as a string.
 
         Args:
@@ -46,7 +46,7 @@ class UdsClient:
         Returns:
             Union[list, str]: The server response as a list of bytes or a formatted string.
         """
-        self.server.logger.info(self._format_request(data_stream))
+        self.server.logger.info(self.format_request(data_stream))
         response = self.server.process_request(data_stream)
         formatted_response = self._format_response(response)
         self.server.logger.info(formatted_response)
