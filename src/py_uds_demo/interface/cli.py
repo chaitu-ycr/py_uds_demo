@@ -10,7 +10,8 @@ class Cli:
         print("💡 UDS CLI Help:")
         print("💡   Enter diagnostic requests in hex format (e.g., 22 F1 87).")
         print("💡   Type 'exit' or 'q' to quit the CLI.")
-        print("💡   Type 'help' or 'h' or '?' for help.")
+        print("💡   Type 'help' or 'h' or '?' for general help.")
+        print("💡   Type 'help <SID>' for help on a specific service (e.g., 'help 10').")
 
     def run(self):
         print("🏃‍➡️ Running UDS Simulation in CLI mode.")
@@ -20,6 +21,18 @@ class Cli:
             if user_input.lower() in ['exit', 'q']:
                 print("👋 Closed UDS Simulation CLI mode.")
                 break
+            if user_input.lower().startswith('help '):
+                try:
+                    sid_str = user_input.split(' ')[1]
+                    sid = int(sid_str, 16)
+                    service = self.client.server.service_map.get(sid)
+                    if service:
+                        print(service.__doc__)
+                    else:
+                        print(f"😡 No help found for SID 0x{sid:02X}.")
+                except (ValueError, IndexError):
+                    print("😡 Invalid help command. Use 'help <SID_in_hex>' (e.g., 'help 10').")
+                continue
             if user_input.lower() in ['help', 'h', '?']:
                 self._help()
                 continue

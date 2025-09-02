@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from CTkMessagebox import CTkMessagebox
 
 from py_uds_demo.core.client import UdsClient
 
@@ -42,6 +43,28 @@ class Gui:
         history_label.pack(pady=5)
         self.history_textbox = ctk.CTkTextbox(history_frame)
         self.history_textbox.pack(padx=5, pady=5, fill=ctk.BOTH, expand=True)
+
+        help_frame = ctk.CTkFrame(self.root, border_color="blue", border_width=2)
+        help_frame.pack(padx=5, pady=5, fill=ctk.X)
+        help_label = ctk.CTkLabel(help_frame, text="❔ Help")
+        help_label.pack(side=ctk.LEFT, padx=5, pady=5)
+        self.help_entry = ctk.CTkEntry(help_frame, placeholder_text="Enter SID (e.g., 10)")
+        self.help_entry.pack(side=ctk.LEFT, padx=5, pady=5, fill=ctk.X, expand=True)
+        self.help_entry.bind("<Return>", lambda event: self._show_help_callback())
+        help_button = ctk.CTkButton(help_frame, text="Get Help", command=self._show_help_callback)
+        help_button.pack(side=ctk.LEFT, padx=5, pady=5)
+
+    def _show_help_callback(self):
+        sid_str = self.help_entry.get()
+        try:
+            sid = int(sid_str, 16)
+            service = self.client.server.service_map.get(sid)
+            if service:
+                CTkMessagebox(title=f"Help for SID 0x{sid:02X}", message=service.__doc__)
+            else:
+                CTkMessagebox(title="Error", message=f"No help found for SID 0x{sid:02X}", icon="cancel")
+        except ValueError:
+            CTkMessagebox(title="Error", message="Invalid SID. Please enter a valid hex value.", icon="cancel")
 
     def _send_request_callback(self):
         request_data: str = self.request_entry.get()

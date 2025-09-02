@@ -14,10 +14,23 @@ from py_uds_demo.core.utils.helpers import Sid, Sfid, Nrc, Did, Memory
 
 class UdsServer:
     """
-    UdsServer implements the Unified Diagnostic Services (UDS) server functionality.
+    Implements the UDS server functionality.
 
-    This class initializes all supported UDS services, constants, and response handlers. It provides
-    a method to process incoming diagnostic requests and route them to the appropriate service handler.
+    This class initializes all supported UDS services, constants, and response
+    handlers. It provides a method to process incoming diagnostic requests and
+    route them to the appropriate service handler.
+
+    Attributes:
+        DEFAULT_LOG_FILE (str): The default path for the log file.
+        logger (logging.Logger): The logger instance for the server.
+        SID (Sid): Service identifiers.
+        SFID (Sfid): Sub-function identifiers.
+        NRC (Nrc): Negative response codes.
+        did (Did): Diagnostic identifiers.
+        memory (Memory): Memory map and data.
+        positive_response (PositiveResponse): Handler for positive responses.
+        negative_response (NegativeResponse): Handler for negative responses.
+        ...and more attributes for each supported service.
     """
     def __init__(self):
         # Logger
@@ -64,12 +77,45 @@ class UdsServer:
         self.transfer_data = upload_download.TransferData(self)
         self.request_transfer_exit = upload_download.RequestTransferExit(self)
         self.request_file_transfer = upload_download.RequestFileTransfer(self)
+        # Service map
+        self.service_map = {
+            self.SID.DIAGNOSTIC_SESSION_CONTROL: self.diagnostic_session_control,
+            self.SID.ECU_RESET: self.ecu_reset,
+            self.SID.SECURITY_ACCESS: self.security_access,
+            self.SID.COMMUNICATION_CONTROL: self.communication_control,
+            self.SID.TESTER_PRESENT: self.tester_present,
+            self.SID.ACCESS_TIMING_PARAMETER: self.access_timing_parameter,
+            self.SID.SECURED_DATA_TRANSMISSION: self.secured_data_transmission,
+            self.SID.CONTROL_DTC_SETTING: self.control_dtc_setting,
+            self.SID.RESPONSE_ON_EVENT: self.response_on_event,
+            self.SID.LINK_CONTROL: self.link_control,
+            self.SID.READ_DATA_BY_IDENTIFIER: self.read_data_by_identifier,
+            self.SID.READ_MEMORY_BY_ADDRESS: self.read_memory_by_address,
+            self.SID.READ_SCALING_DATA_BY_IDENTIFIER: self.read_scaling_data_by_identifier,
+            self.SID.READ_DATA_BY_PERIODIC_IDENTIFIER: self.read_data_by_periodic_identifier,
+            self.SID.DYNAMICALLY_DEFINE_DATA_IDENTIFIER: self.dynamically_define_data_identifier,
+            self.SID.WRITE_DATA_BY_IDENTIFIER: self.write_data_by_identifier,
+            self.SID.WRITE_MEMORY_BY_ADDRESS: self.write_memory_by_address,
+            self.SID.CLEAR_DIAGNOSTIC_INFORMATION: self.clear_diagnostic_information,
+            self.SID.READ_DTC_INFORMATION: self.read_dtc_information,
+            self.SID.INPUT_OUTPUT_CONTROL_BY_IDENTIFIER: self.input_output_control_by_identifier,
+            self.SID.ROUTINE_CONTROL: self.routine_control,
+            self.SID.REQUEST_DOWNLOAD: self.request_download,
+            self.SID.REQUEST_UPLOAD: self.request_upload,
+            self.SID.TRANSFER_DATA: self.transfer_data,
+            self.SID.REQUEST_TRANSFER_EXIT: self.request_transfer_exit,
+            self.SID.REQUEST_FILE_TRANSFER: self.request_file_transfer,
+        }
 
     def _initialize_logger(self):
         """
-        Initialize the logger.
+        Initializes the logger for the UDS server.
 
-        Sets up the logging configuration to log messages to both console and a file.
+        Sets up the logging configuration to output messages to both the console
+        and a file.
+
+        Returns:
+            logging.Logger: The configured logger instance.
         """
         os.makedirs(os.path.dirname(self.DEFAULT_LOG_FILE), exist_ok=True)
         logger = logging.getLogger(__name__)
@@ -91,23 +137,26 @@ class UdsServer:
     @property
     def supported_services(self) -> list:
         """
-        List all supported UDS service identifiers (SIDs).
+        Returns a list of all supported UDS service identifiers (SIDs).
 
         Returns:
-            list: A list of supported service identifiers.
+            A list of integers representing the supported SIDs.
         """
         return list(self.SID.__dict__.values())
 
     def process_request(self, data_stream: list) -> list:
         """
-        Process the incoming data stream and return a UDS response.
+        Processes an incoming UDS request and returns a response.
 
         Args:
-            data_stream (list): The incoming diagnostic request as a list of bytes/integers.
+            data_stream: A list of integers representing the incoming
+                diagnostic request bytes.
 
         Returns:
-            list: The response to the request, as a list of bytes/integers.
+            A list of integers representing the response to the request.
         """
+        if not data_stream:
+            return self.negative_response.report_negative_response(0x00, self.NRC.GENERAL_REJECT)
         sid = data_stream[0]
         match sid:
             # Diagnostic and communication management
