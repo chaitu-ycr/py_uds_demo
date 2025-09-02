@@ -14,7 +14,10 @@ classifiers = [
 ]
 dependencies = [
     "customtkinter",
+    "CTkMessagebox",
     "gradio",
+    "fastapi",
+    "uvicorn",
 ]
 
 [dependency-groups]

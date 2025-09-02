@@ -43,6 +43,26 @@ class Web:
         self.diag_req_textbox.submit(self.chat_bot_process, [self.diag_req_textbox, self.uds_sim_chatbot], [self.diag_req_textbox, self.uds_sim_chatbot])
         self.tester_present_checkbox.change(self._update_tester_present, [self.tester_present_checkbox])
 
+        with gr.Row():
+            self.help_sid_textbox = gr.Textbox(label="Help with SID", placeholder="Enter SID (e.g., 10)", show_label=True)
+            self.help_button = gr.Button(value="Get Help")
+        self.help_button.click(self._show_help_callback, [self.help_sid_textbox, self.uds_sim_chatbot], [self.help_sid_textbox, self.uds_sim_chatbot])
+
+    def _show_help_callback(self, sid_str, chat_history):
+        try:
+            sid = int(sid_str, 16)
+            service = self.uds_client.server.service_map.get(sid)
+            if service:
+                chat_history.append({"role": "user", "content": f"Help for SID 0x{sid:02X}"})
+                chat_history.append({"role": "assistant", "content": service.__doc__})
+            else:
+                chat_history.append({"role": "user", "content": f"Help for SID 0x{sid:02X}"})
+                chat_history.append({"role": "assistant", "content": f"No help found for SID 0x{sid:02X}."})
+        except (ValueError, IndexError):
+            chat_history.append({"role": "user", "content": f"Help for SID {sid_str}"})
+            chat_history.append({"role": "assistant", "content": "Invalid SID. Please enter a valid hex value."})
+        return "", chat_history
+
     def chat_bot_process(self, diagnostic_request, chat_history):
         """
         Process user diagnostic request and update chat history.

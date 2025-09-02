@@ -1,14 +1,23 @@
 def split_integer_to_bytes(value: int) -> list[int]:
-    """
-    Splits an integer into a list of bytes.
+    """Splits an integer into a list of bytes (little-endian).
+
+    Args:
+        value: The integer to split.
+
+    Returns:
+        A list of integers, where each integer is a byte.
     """
     return [(value >> (i * 8)) & 0xFF for i in range((value.bit_length() + 7) // 8)]
 
 
 class Sid:
-    """
-    This class holds all service identifiers name and its value respectively.
-    Check ISO 14229 doc for more information.
+    """Service Identifiers (SIDs) for UDS.
+
+    This class contains constants for all service identifiers as defined in
+    the ISO 14229 standard. Each SID has a long name and a short alias.
+
+    See Also:
+        ISO 14229
     """
     def __init__(self) -> None:
         # Diagnostic and communication management
@@ -48,9 +57,13 @@ class Sid:
 
 
 class Sfid:
-    """
-    This class holds all service identifier sub-functions name and its value respectively.
-    Check ISO 14229 doc for more information.
+    """Sub-function Identifiers (SFIDs) for UDS.
+
+    This class contains constants for all sub-function identifiers as defined
+    in the ISO 14229 standard. Each SFID has a long name and a short alias.
+
+    See Also:
+        ISO 14229
     """
     def __init__(self) -> None:
         # diagnostic_session_control
@@ -138,9 +151,13 @@ class Sfid:
 
 
 class Nrc:
-    """
-    This class holds all negative response codes name and its values respectively.
-    Check ISO 14229 doc for more information.
+    """Negative Response Codes (NRCs) for UDS.
+
+    This class contains constants for all negative response codes as defined
+    in the ISO 14229 standard. Each NRC has a long name and a short alias.
+
+    See Also:
+        ISO 14229
     """
     def __init__(self) -> None:
         self.GENERAL_REJECT = self.GR = 0x10
@@ -186,8 +203,9 @@ class Nrc:
 
 
 class Did:
-    """
-    This class holds all diagnostic identifiers name and its values respectively.
+    """Diagnostic Identifiers (DIDs) for UDS.
+
+    This class contains constants for various diagnostic identifiers.
     """
     def __init__(self) -> None:
         self.VEHICLE_IDENTIFICATION_NUMBER = 0xF190
@@ -207,8 +225,16 @@ class Did:
 
 
 class Memory:
-    """
-    This class holds all memory addresses and their corresponding values.
+    """A simulated memory map for the UDS server.
+
+    This class holds memory addresses, their corresponding values, and other
+    data like DTCs and writable DIDs.
+
+    Attributes:
+        writable_dids (list): A list of DIDs that are writable.
+        did_data (dict): A dictionary to store data for DIDs.
+        memory_map (dict): A dictionary representing the memory layout.
+        dtcs (list): A list of Diagnostic Trouble Codes.
     """
     def __init__(self) -> None:
         self.writable_dids = [0xF198, 0xF199]  # Example: Repair Shop Code and Programming Date
@@ -224,52 +250,65 @@ class Memory:
 
     @property
     def vehicle_identification_number(self):
+        """The vehicle identification number (VIN)."""
         return split_integer_to_bytes(0x1234567890)
 
     @property
     def manufacturer_spare_part_number(self):
+        """The manufacturer's spare part number."""
         return split_integer_to_bytes(0x1111111111)
 
     @property
     def manufacturer_ecu_software_number(self):
+        """The manufacturer's ECU software number."""
         return split_integer_to_bytes(0x20250801)
 
     @property
     def manufacturer_ecu_software_version(self):
+        """The manufacturer's ECU software version."""
         return split_integer_to_bytes(0x202508010203)
 
     @property
     def ecu_manufacturing_date(self):
+        """The ECU manufacturing date."""
         return split_integer_to_bytes(0x20250801)
 
     @property
     def ecu_serial_number(self):
+        """The ECU serial number."""
         return split_integer_to_bytes(0x1234567890)
 
     @property
     def supported_functional_units(self):
+        """The supported functional units."""
         return split_integer_to_bytes(0x00000001)
 
     @property
     def system_supplier_ecu_software_number(self):
+        """The system supplier's ECU software number."""
         return split_integer_to_bytes(0x20250801)
 
     @property
     def system_supplier_ecu_software_version(self):
+        """The system supplier's ECU software version."""
         return split_integer_to_bytes(0x202508010203)
 
     @property
     def programming_date(self):
+        """The programming date."""
         return split_integer_to_bytes(0x20250801)
 
     @property
     def repair_shop_code(self):
+        """The repair shop code."""
         return split_integer_to_bytes(0x123456)
 
     @property
     def exhaust_regulation_type_approval_number(self):
+        """The exhaust regulation type approval number."""
         return split_integer_to_bytes(0x123456)
 
     @property
     def ecu_installation_date(self):
+        """The ECU installation date."""
         return split_integer_to_bytes(0x20250801)
