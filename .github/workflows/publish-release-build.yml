@@ -24,15 +24,15 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade poetry
-          poetry build
-          poetry install
+          python -m pip install --upgrade uv
+          uv build
+          uv sync
 
       - name: Read Version, Create Tag, and Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $PKG_VERSION = (poetry version --short)
+          $PKG_VERSION = (uv version --short)
           $TAG_NAME = "v$PKG_VERSION"
 
           # Create and push the Git tag
@@ -60,5 +60,5 @@ jobs:
       # Uncomment the following step to publish to PyPi
       # - name: Publish to PyPi
       #   env:
-      #     POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
-      #   run: poetry publish
+      #     UV_PYPI_TOKEN_PYPI: ${{ secrets.UV_PYPI_TOKEN_PYPI }}
+      #   run: uv publish
