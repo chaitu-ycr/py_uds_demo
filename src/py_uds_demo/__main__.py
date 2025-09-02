@@ -1,9 +1,11 @@
 import argparse
 import sys
 
+
 from py_uds_demo.interface.cli import Cli
 from py_uds_demo.interface.gui import Gui
 from py_uds_demo.interface.web import Web
+import uvicorn
 
 def main():
     parser = argparse.ArgumentParser(
@@ -22,9 +24,9 @@ def main():
 
     parser.add_argument(
         "--mode",
-        choices=["cli", "gui", "web"],
+        choices=["cli", "gui", "web", "api"],
         default="cli",
-        help="Select mode to run: cli (default), gui, or web"
+        help="Select mode to run: cli (default), gui, web, or api (FastAPI server)"
     )
 
     if "?" in sys.argv:
@@ -45,6 +47,9 @@ def main():
             print("Starting Web Mode...")
             web = Web()
             web.run()
+        case "api":
+            print("Starting FastAPI server (API Mode)...")
+            uvicorn.run("py_uds_demo.interface.api:app", host="127.0.0.1", port=8000, reload=True)
         case _:
             print("Unknown mode selected.")
 

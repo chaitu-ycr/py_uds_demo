@@ -38,11 +38,26 @@ python -m py_uds_demo --mode gui
 ```
 Launches a graphical interface for sending requests.
 
+
 ### Web Mode
 ```sh
 python -m py_uds_demo --mode web
 ```
 Opens a Gradio web app at `http://<your-host>:7865`.
+
+### API Mode (FastAPI)
+```sh
+python -m py_uds_demo --mode api
+```
+Starts a FastAPI server at `http://127.0.0.1:8000`.
+You can interact with the API using tools like curl, Postman, or your browser:
+
+- Open the interactive docs at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- Example: Send a diagnostic request (POST to `/send_request`)
+
+```sh
+curl -X POST "http://127.0.0.1:8000/send_request" -H "Content-Type: application/json" -d "{\"data\":[34,241,135]}"
+```
 
 ---
 
