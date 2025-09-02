@@ -9,7 +9,7 @@ class ClearDiagnosticInformation:
 
     def process_request(self, data_stream: list) -> list:
         # This is a simulated implementation
-        if self.uds_server.diagnostic_session_control.dtc_setting == self.uds_server.SFID.OFF:
+        if self.uds_server.control_dtc_setting.dtc_setting == self.uds_server.SFID.OFF:
             return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.CDTCI, self.uds_server.NRC.CONDITIONS_NOT_CORRECT)
 
         self.uds_server.memory.dtcs = []
