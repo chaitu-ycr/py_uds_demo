@@ -231,9 +231,40 @@ class AccessTimingParameter:
             self.uds_server.SFID.READ_CURRENTLY_ACTIVE_TIMING_PARAMETERS,
             self.uds_server.SFID.SET_TIMING_PARAMETERS_TO_GIVEN_VALUES,
         ]
+        self.timing_parameters = {
+            "P2_HIGH": 0x00,
+            "P2_LOW": 0x32,
+            "P2_STAR_HIGH": 0x13,
+            "P2_STAR_LOW": 0x88,
+        }
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.ATP, data_stream[1:])
+        if len(data_stream) < 2:
+            return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.ATP, self.uds_server.NRC.INCORRECT_MESSAGE_LENGTH_OR_INVALID_FORMAT)
+
+        sfid = data_stream[1]
+        if sfid not in self.supported_subfunctions:
+            return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.ATP, self.uds_server.NRC.SUB_FUNCTION_NOT_SUPPORTED)
+
+        if sfid == self.uds_server.SFID.READ_EXTENDED_TIMING_PARAMETER_SET or sfid == self.uds_server.SFID.READ_CURRENTLY_ACTIVE_TIMING_PARAMETERS:
+            return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.ATP, [sfid] + list(self.timing_parameters.values()))
+
+        if sfid == self.uds_server.SFID.SET_TIMING_PARAMETERS_TO_DEFAULT_VALUE:
+            # In a real implementation, this would reset timing parameters to their default values.
+            return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.ATP, [sfid])
+
+        if sfid == self.uds_server.SFID.SET_TIMING_PARAMETERS_TO_GIVEN_VALUES:
+            # This is a simulated implementation
+            if len(data_stream) != 6:
+                return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.ATP, self.uds_server.NRC.INCORRECT_MESSAGE_LENGTH_OR_INVALID_FORMAT)
+
+            self.timing_parameters["P2_HIGH"] = data_stream[2]
+            self.timing_parameters["P2_LOW"] = data_stream[3]
+            self.timing_parameters["P2_STAR_HIGH"] = data_stream[4]
+            self.timing_parameters["P2_STAR_LOW"] = data_stream[5]
+            return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.ATP, [sfid])
+
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.ATP, self.uds_server.NRC.REQUEST_OUT_OF_RANGE)
 
 
 class SecuredDataTransmission:
@@ -241,7 +272,8 @@ class SecuredDataTransmission:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.SDT, data_stream[1:])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.SDT, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class ControlDtcSetting:
@@ -255,6 +287,7 @@ class ControlDtcSetting:
             self.uds_server.SFID.PROGRAMMING_SESSION,
             self.uds_server.SFID.EXTENDED_SESSION,
         ]
+        self.dtc_setting = self.uds_server.SFID.ON
 
     def process_request(self, data_stream: list) -> list:
         # 0x13: IncorrectMessageLengthOrInvalidFormat
@@ -267,6 +300,8 @@ class ControlDtcSetting:
         sfid = data_stream[1]
         if sfid not in self.supported_subfunctions:
             return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.CDTCS, self.uds_server.NRC.SUB_FUNCTION_NOT_SUPPORTED)
+
+        self.dtc_setting = sfid
         # Positive Response
         return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.CDTCS, data_stream[1:])
 
@@ -288,8 +323,8 @@ class ResponseOnEvent:
         ]
 
     def process_request(self, data_stream: list) -> list:
-        # Positive Response
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.ROE, data_stream[1:])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.ROE, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class LinkControl:
@@ -302,5 +337,5 @@ class LinkControl:
         ]
 
     def process_request(self, data_stream: list) -> list:
-        # Positive Response
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.LC, data_stream[1:])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.LC, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)

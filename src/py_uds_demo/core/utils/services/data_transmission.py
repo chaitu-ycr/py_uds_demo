@@ -51,7 +51,16 @@ class ReadMemoryByAddress:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RMBA, [0x00])
+        # This is a simulated implementation
+        if len(data_stream) != 5:
+            return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RMBA, self.uds_server.NRC.INCORRECT_MESSAGE_LENGTH_OR_INVALID_FORMAT)
+
+        address = (data_stream[1] << 24) | (data_stream[2] << 16) | (data_stream[3] << 8) | data_stream[4]
+
+        if address not in self.uds_server.memory.memory_map:
+            return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RMBA, self.uds_server.NRC.REQUEST_OUT_OF_RANGE)
+
+        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RMBA, self.uds_server.memory.memory_map[address])
 
 
 class ReadScalingDataByIdentifier:
@@ -59,7 +68,8 @@ class ReadScalingDataByIdentifier:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RSDBI, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RSDBI, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class ReadDataByPeriodicIdentifier:
@@ -67,7 +77,8 @@ class ReadDataByPeriodicIdentifier:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RDBPI, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RDBPI, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class DynamicallyDefineDataIdentifier:
@@ -75,7 +86,8 @@ class DynamicallyDefineDataIdentifier:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.DDDI, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.DDDI, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class WriteDataByIdentifier:
@@ -83,7 +95,22 @@ class WriteDataByIdentifier:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.WDBI, [0x00])
+        # This is a simulated implementation
+        if len(data_stream) < 4:
+            return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.WDBI, self.uds_server.NRC.INCORRECT_MESSAGE_LENGTH_OR_INVALID_FORMAT)
+
+        did = (data_stream[1] << 8) | data_stream[2]
+
+        if did not in self.uds_server.memory.writable_dids:
+            return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.WDBI, self.uds_server.NRC.REQUEST_OUT_OF_RANGE)
+
+        data_to_write = data_stream[3:]
+
+        # Simulate writing to a DID
+        # In a real ECU, this would update a value in memory
+        self.uds_server.memory.did_data[did] = data_to_write
+
+        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.WDBI, data_stream[1:3])
 
 
 class WriteMemoryByAddress:
@@ -91,4 +118,14 @@ class WriteMemoryByAddress:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.WMBA, [0x00])
+        # This is a simulated implementation
+        if len(data_stream) < 6:
+            return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.WMBA, self.uds_server.NRC.INCORRECT_MESSAGE_LENGTH_OR_INVALID_FORMAT)
+
+        address = (data_stream[1] << 24) | (data_stream[2] << 16) | (data_stream[3] << 8) | data_stream[4]
+        data_to_write = data_stream[5:]
+
+        # Simulate writing to memory
+        self.uds_server.memory.memory_map[address] = data_to_write
+
+        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.WMBA, [])

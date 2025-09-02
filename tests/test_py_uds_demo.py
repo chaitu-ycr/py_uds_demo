@@ -2,7 +2,7 @@
 import pytest
 from py_uds_demo.core.client import UdsClient
 from py_uds_demo.core.server import UdsServer
-from py_uds_demo.core.utils.helpers import Sid, Nrc
+from py_uds_demo.core.utils.helpers import Sid, Sfid, Nrc
 
 @pytest.fixture
 def uds_client():
@@ -60,3 +60,59 @@ def test_server_process_request_negative(uds_server):
     assert resp[0] == 0x7F
     assert resp[1] == 0x99
     assert resp[2] == Nrc().SERVICE_NOT_SUPPORTED
+
+# Tests for newly implemented services
+
+def test_read_memory_by_address_positive(uds_client):
+    req = [Sid().RMBA, 0x00, 0x00, 0x10, 0x00]
+    resp = uds_client.send_request(req, False)
+    assert resp == [Sid().RMBA + 0x40, 0x11, 0x22, 0x33, 0x44]
+
+def test_read_memory_by_address_negative(uds_client):
+    req = [Sid().RMBA, 0x00, 0x00, 0x30, 0x00] # Invalid address
+    resp = uds_client.send_request(req, False)
+    assert resp == [0x7F, Sid().RMBA, Nrc().REQUEST_OUT_OF_RANGE]
+
+def test_write_data_by_identifier_positive(uds_client):
+    did = 0xF199
+    req = [Sid().WDBI, (did >> 8) & 0xFF, did & 0xFF, 0x20, 0x24, 0x01, 0x01]
+    resp = uds_client.send_request(req, False)
+    assert resp == [Sid().WDBI + 0x40, (did >> 8) & 0xFF, did & 0xFF]
+
+def test_write_data_by_identifier_negative(uds_client):
+    did = 0xAAAA # Invalid DID
+    req = [Sid().WDBI, (did >> 8) & 0xFF, did & 0xFF, 0x20, 0x24, 0x01, 0x01]
+    resp = uds_client.send_request(req, False)
+    assert resp == [0x7F, Sid().WDBI, Nrc().REQUEST_OUT_OF_RANGE]
+
+def test_clear_diagnostic_information_positive(uds_client):
+    req = [Sid().CDTCI]
+    resp = uds_client.send_request(req, False)
+    assert resp == [Sid().CDTCI + 0x40]
+    # Verify that DTCs are cleared
+    req = [Sid().RDTCI, Sfid().RNODTCBSM, 0xFF]
+    resp = uds_client.send_request(req, False)
+    assert resp[-1] == 0 # No DTCs
+
+def test_read_dtc_information_positive(uds_client):
+    req = [Sid().RDTCI, Sfid().RNODTCBSM, 0xFF]
+    resp = uds_client.send_request(req, False)
+    assert resp[0] == Sid().RDTCI + 0x40
+    assert resp[-1] > 0 # Should have at least one DTC initially
+
+def test_input_output_control_by_identifier_positive(uds_client):
+    did = 0xAE01
+    req = [Sid().IOCBI, (did >> 8) & 0xFF, did & 0xFF, 0x03] # Return control to ECU
+    resp = uds_client.send_request(req, False)
+    assert resp == [Sid().IOCBI + 0x40, (did >> 8) & 0xFF, did & 0xFF]
+
+def test_routine_control_positive(uds_client):
+    routine_id = 0xFF00
+    req = [Sid().RC, Sfid().STR, (routine_id >> 8) & 0xFF, routine_id & 0xFF]
+    resp = uds_client.send_request(req, False)
+    assert resp == [Sid().RC + 0x40, Sfid().STR, (routine_id >> 8) & 0xFF, routine_id & 0xFF]
+
+def test_upload_download_negative(uds_client):
+    req = [Sid().RD, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
+    resp = uds_client.send_request(req, False)
+    assert resp == [0x7F, Sid().RD, Nrc().SERVICE_NOT_SUPPORTED]

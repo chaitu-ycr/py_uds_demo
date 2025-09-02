@@ -211,7 +211,16 @@ class Memory:
     This class holds all memory addresses and their corresponding values.
     """
     def __init__(self) -> None:
-        pass
+        self.writable_dids = [0xF198, 0xF199]  # Example: Repair Shop Code and Programming Date
+        self.did_data = {}
+        self.memory_map = {
+            0x1000: [0x11, 0x22, 0x33, 0x44],
+            0x2000: [0xAA, 0xBB, 0xCC, 0xDD],
+        }
+        self.dtcs = [
+            [0x9A, 0x01, 0x01], # Example DTC 1
+            [0x9A, 0x02, 0x01], # Example DTC 2
+        ]
 
     @property
     def vehicle_identification_number(self):
