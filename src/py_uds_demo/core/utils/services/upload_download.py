@@ -8,7 +8,8 @@ class RequestDownload:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RD, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RD, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class RequestUpload:
@@ -16,14 +17,16 @@ class RequestUpload:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RU, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RU, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 class TransferData:
     def __init__(self, uds_server: 'UdsServer') -> None:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.TD, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.TD, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class RequestTransferExit:
@@ -31,7 +34,8 @@ class RequestTransferExit:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RTE, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RTE, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
 
 
 class RequestFileTransfer:
@@ -39,4 +43,5 @@ class RequestFileTransfer:
         self.uds_server: 'UdsServer' = uds_server
 
     def process_request(self, data_stream: list) -> list:
-        return self.uds_server.positive_response.report_positive_response(self.uds_server.SID.RFT, [0x00])
+        # This service is not fully implemented in this simulator
+        return self.uds_server.negative_response.report_negative_response(self.uds_server.SID.RFT, self.uds_server.NRC.SERVICE_NOT_SUPPORTED)
